@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+{% load staticfiles %}
+<head>
+	<title>Car Manage</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<body>
+
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link" href="/" style="padding-right: 30px; padding-left: 30px">Cars <span class="sr-only">(current)</span></a>
+      </li>
+
+      <li class="nav-item dropdown">
+	    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Configure</a>
+	    <div class="dropdown-menu">
+	      <a class="dropdown-item" href="/colors">Color</a>
+	      <a class="dropdown-item" href="/types">Type</a>
+	      <a class="dropdown-item" href="/brands">Brand</a>
+	  </li>
+
+    </ul>
+  </div>
+</nav>
+
+	<div style="padding: 20px;">
+		<div class="text-right" style="padding: 10px;">
+			<button class="btn btn-success" data-toggle="modal" data-target="#add_car">Add a Car</button>
+			<button class="btn btn-primary" data-toggle="modal" data-target="#move_car">Move a Car</button>
+			<button class="btn btn-info" data-toggle="modal" data-target="#group_car" id="group_car_btn">Group Cars</button>
+		</div>
+
+	<div class="card-body table-responsive p-0">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Car Name</th>
+                      <th>Brand</th>
+                      <th>Type</th>
+                      <th>Color</th>
+                    </tr>
+                  </thead>
+                  <tbody id="data_table">
+                  	{% for line in cars %}
+                    <tr>
+                      <td>{{line.car_name}}</td>
+                      <td>{{line.car_brand.brand_name}}</td>
+                      <td>{{line.car_type.type_description}}</td>
+                       <td>{{line.car_color.color_description}}</td>
+                      
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+
+	</div>
+
+	<div class="modal fade" id="add_car" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalLabel">Add a Car</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	      <form id="addForm" action="" method="POST">{% csrf_token %}
+			   <div class="form-group row">
+			    <label for="brand" class="col-sm-3 col-form-label text-right">Brand</label>
+			    <div class="col-sm-9">
+			      <input type="text" class="form-control" id="brand" name="brand" list="brandSeacrhList">
+			      <datalist id="brandSeacrhList"> 
+                   </datalist>
+
+			    </div>
+			  </div>   
+			  <div class="form-group row">
+			    <label for="brand" class="col-sm-3 col-form-label text-right">Model</label>
+			    <div class="col-sm-9">
+			      <input type="text" class="form-control" id="car_model" name="car_model" >
+			  </div>  
+			  </div>  
+			  <div class="form-group row">
+			    <label for="type" class="col-sm-3 col-form-label text-right">Type</label>
+			    <div class="col-sm-9">
+			      <input type="text" class="form-control" id="type" name="type" list="typeSeacrhList">
+			      <datalist id="typeSeacrhList">
+                   </datalist>
+			    </div>
+			  </div>
+
+			   <div class="form-group row">
+			    <label for="color" class="col-sm-3 col-form-label text-right">Color</label>
+			    <div class="col-sm-9">
+			      <input type="text" class="form-control" id="color" name="color" list="colorSeacrhList">
+			      <datalist id="colorSeacrhList">
+                   </datalist>
+
+			    </div>
+			  </div>
+			</form>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	        <button type="button" id="save_car" class="btn btn-success">Save</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<div class="modal fade" id="move_car" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalLabel">Move a Car</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	      		<form id="move_car_form" action="" method="POST">{% csrf_token %}
+
+			   <div class="form-group row">
+			    <label for="color" class="col-sm-4 col-form-label text-right">Car to Move</label>
+			    <div class="col-sm-8">
+			      <input type="text" class="form-control" id="car" name="car" list="carSeacrhList">
+			      <datalist id="carSeacrhList">
+                   </datalist>
+
+			    </div>
+			  </div>
+			  <div class="form-group row">
+			    <label for="color" class="col-sm-4 col-form-label text-right">To</label>
+			    <div class="col-sm-8">
+			      <select id="move_to" name="move_to" class="form-control" >
+			        <option>Before</option>
+			        <option>After</option>
+			      </select>
+			    </div>
+			  </div>
+			   <div class="form-group row">
+			    <label for="color" class="col-sm-4 col-form-label text-right">Reference Car</label>
+			    <div class="col-sm-8">
+			      <input type="text" class="form-control" id="ref_car" name="ref_car" list="ref_carSeacrhList">
+			      <datalist id="ref_carSeacrhList">
+
+                   </datalist>
+
+			    </div>
+			  </div>
+			  			   <div class="form-group row">
+			    <label for="color" class="col-sm-12 col-form-label text-center"><span id="car_to_move" style="font-weight: bold">Example Car Name</span> (Car to Move) will be placed <span id="action"  style="font-weight: bold">Before</span> the Reference Car - [<span id="move_to_ref_car" style="font-weight: bold">Car Name</span>]</label>
+
+			  </div> 
+			</form>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	        <button type="button" id="move_car_btn" class="btn btn-primary">Move</button>
+	      </div>
+	 
+	    </div>
+	  </div>
+	</div>
+
+
+
+	<div class="modal fade bd-example-modal-xl" id="group_car" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
+	  <div class="modal-dialog modal-xl" role="document">
+	    <div class="modal-content">
+	      	<div class="modal-header">
+			    <h5 class="modal-title" id="exampleModalLabel">Group Cars</h5>
+			    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			    	<span aria-hidden="true">&times;</span>
+			    </button>
+			</div>
+			<div class="modal-body">
+				<form id="addForm" action="" method="POST">{% csrf_token %}
+				<div class="form-group row">
+			    <label for="brand" class="col-sm-4 col-form-label text-right">Group Cars By</label>
+			    <div class="col-sm-5">
+			    	<select id="reference_type" name="reference_type" class="form-control" >
+				        <option>Type</option>
+				        <option>Brand</option>
+				        <option>Color</option>
+				      </select>
+
+			    </div>
+			  </div>
+			  <div class="form-group row" style="display: none">
+			    <label for="reference" class="col-sm-4 col-form-label text-right">Reference</label>
+			    <div class="col-sm-5">
+			      <input type="text" class="form-control" id="reference" name="reference">
+			     
+			    </div>
+			  </div>   
+
+			   <div class="form-group row" id="brand_div">
+			    <label for="brand_g" class="col-sm-4 col-form-label text-right">Brand</label>
+			    <div class="col-sm-5">
+			      <input type="text" class="form-control" id="brand_g" name="brand_g" list="brand_gSeacrhList">
+			      <datalist id="brand_gSeacrhList"> 
+                   </datalist>
+
+			    </div>
+			  </div>   
+			  <div class="form-group row" id="type_div">
+			    <label for="type_g" class="col-sm-4 col-form-label text-right">Type</label>
+			    <div class="col-sm-5">
+			      <input type="text" class="form-control" id="type_g" name="type_g" list="type_gSeacrhList">
+			      <datalist id="type_gSeacrhList">
+                   </datalist>
+			    </div>
+			  </div>
+
+			   <div class="form-group row" id="color_div">
+			    <label for="color_g" class="col-sm-4 col-form-label text-right">Color</label>
+			    <div class="col-sm-5">
+			      <input type="text" class="form-control" id="color_g" name="color_g" list="color_gSeacrhList">
+			      <datalist id="color_gSeacrhList">
+                   </datalist>
+
+			    </div>
+			  </div>
+			</form>
+			  	<div class="card-body table-responsive p-0">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Car Name</th>
+                      <th>Brand</th>
+                      <th>Type</th>
+                      <th>Color</th>
+                    </tr>
+                  </thead>
+                  <tbody id="data_group_table">
+                  
+                  </tbody>
+                </table>
+              </div>
+			</div>
+	    </div>
+	  </div>
+	</div>
+
+
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+	
+	<script type="text/javascript" src="{% static 'find_functions.js' %}"></script>
+	<script type="text/javascript" src="{% static 'update_functions.js' %}"></script>
+	<script type="text/javascript" src="{% static 'set_functions.js' %}"></script>
+	<script type="text/javascript" src="{% static 'grouping_functions.js' %}"></script>
+	
+</body>
+</html>
