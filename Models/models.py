@@ -30,7 +30,7 @@ class Color(models.Model):
 class Car(models.Model):
 
 	car_name = models.CharField(max_length=50)
-	order = models.FloatField(default=0, null=True)
+	order = models.DecimalField(max_digits=28, decimal_places= 25, default=0, null=True)
 	car_model = models.CharField(max_length=50)
 
 	car_type = models.ForeignKey(CarType, on_delete=models.CASCADE, related_name='car_type', null=True)

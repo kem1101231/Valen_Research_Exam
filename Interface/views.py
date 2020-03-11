@@ -223,10 +223,16 @@ def move_car(request):
 
 		car_to_move_data = Car.objects.get(id=car_to_move)
 		ref_car_data = Car.objects.get(id=move_to)
-		
+
+		ref_prev_car = get_prev_car(ref_car_data)
+		ref_next_car = get_next_car(ref_car_data)
+
+
 		the_car_order = car_to_move_data.order
 		ref_car_order = ref_car_data.order
-		
+
+		avg_order = 0	
+
 		operator = 'minus' if ref_car_order > the_car_order else 'plus'
 		
 		#the value of the order where the update would start 
@@ -235,25 +241,36 @@ def move_car(request):
 		#the value of the order where the update would end
 		end_order = the_car_order - 1 if operator == 'plus' else 0
 
-		if position == 'Before':
-			if operator == 'minus':
-				end_order = ref_car_order - 1
-			else:
-				start_order = ref_car_order
-		else:
-			if operator == 'minus':
-				end_order = ref_car_order
-			else:
-				start_order = ref_car_order + 1
+		new_order = 0
 
-		# Saves sa the order value of the car to be moved
-		the_car_order = end_order if operator == 'minus' else start_order
-		
-		#update all cars with order value within start_order value up to end_order value
-		update_order(start_order, end_order, operator)
-		
-		#updates the new order value of the recently moved car
-		car_to_move_data.order = the_car_order
+
+		if position == 'Before':
+
+			if check_order_exist(int(ref_car_order)) and ref_prev_car.order < int(ref_car_order):
+				new_order = int(ref_car_order)
+			
+			else:
+				if check_order_exist(int(ref_car_order)-1) and ref_prev_car.order < int(ref_car_order-1):
+					new_order = int(ref_car_order) - 1
+
+				else:
+					new_order = (ref_prev_car.order + ref_car_order) / 2
+
+
+		else:
+
+			if check_order_exist(int(ref_car_order)) and ref_next_car.order > int(ref_car_order):
+				new_order = int(ref_car_order)
+			
+			else:
+				if check_order_exist(int(ref_car_order)-1) and ref_next_car.order > int(ref_car_order+1):
+					new_order = int(ref_car_order) + 1
+
+				else:
+					new_order = (ref_next_car.order + ref_car_order) / 2			
+
+
+		car_to_move_data.order = new_order
 		car_to_move_data.save()
 
 		return HttpResponse('')
@@ -268,3 +285,19 @@ def update_order(start_order, end_order, operator):
 		else:
 			car.order += 1
 		car.save()
+
+
+def get_prev_car(car_reference):
+	car_list = Car.objects.filter(order__lt=car_reference.order).order_by('-order')
+	return car_list[0]
+
+def get_next_car(car_reference):
+	car_list = Car.objects.filter(order__gt=car_reference.order).order_by('order')
+	return car_list[0]
+
+def check_order_exist(order_ref):
+	result = Car.objects.filter(order=order_ref)
+	if len(result) != 0:
+		return True
+	else:
+		return False	
